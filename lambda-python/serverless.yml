@@ -1,0 +1,114 @@
+service: lambda-python
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: us-east-1
+  memorySize: 128
+  timeout: 10
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: 'arn:aws:dynamodb:us-east-1:*:table/TODOTABLE'
+
+package:
+  individually: true
+  exclude:
+    - 'todos/**'
+
+functions:
+  get:
+    handler: todos/get.get
+    description: Get todo item by id
+    package:
+      include:
+        - todos/get.py
+        - utils/**
+    events:
+      - http:
+          path: /todos/{id}
+          method: get
+          cors: true
+
+  create:
+    handler: todos/create.create
+    description: Create a todo item
+    package:
+      include:
+        - todos/create.py
+        - utils/**
+    events:
+      - http:
+          path: /create
+          method: post
+          cors: true
+    
+  list:
+    handler: todos/list.list
+    description: List todo items
+    package:
+      include:
+        - todos/list.py
+        - utils/**
+    events:
+      - http:
+          path: /list
+          method: get
+          cors: true
+
+  update:
+    handler: todos/update.update
+    description: Update a todo item
+    package:
+      include:
+        - todos/update.py
+        - todos/get.py
+        - utils/**
+    events:
+      - http:
+          path: /todos/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: todos/delete.delete
+    description: Delete a todo item
+    package:
+      include:
+        - todos/delete.py
+        - todos/get.py
+        - utils/**
+    events:
+      - http:
+          path: /todos/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: TODOTABLE
