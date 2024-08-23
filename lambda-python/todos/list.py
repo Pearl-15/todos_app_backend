@@ -9,12 +9,17 @@ table = dynamodb.Table('TODOTABLE')
 # table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
 def list(event, context):
-    print("List function")
+    print("List function event", event)
+
+    #get user_id
+    user_id = event['requestContext']['authorizer']['claims']['sub']
+    
+
     body = {}
     status_code = 200
     try:
-        print("Scanning DynamoDB ...")
-        result = table.scan()
+        print("Query DynamoDB ...")
+        result = table.query(KeyConditionExpression=boto3.dynamodb.conditions.Key('user_id').eq(user_id))
         body = buildDefaultResponseBody(result["Items"], None, None)
     except ClientError as e:
     # ClientError => error response provided by an AWS Service to Boto3 client's request

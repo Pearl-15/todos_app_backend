@@ -9,14 +9,17 @@ table = dynamodb.Table('TODOTABLE')
 def get(event, context):
     print("get id funciton...")
 
+    #get user_id 
+    user_id = event['requestContext']['authorizer']['claims']['sub']
+
     body = {}
     status_code = 200
     result = {}
     try:
-        result = table.get_item(Key={'id': event['pathParameters']['id']})
+        result = table.get_item(Key={'user_id': user_id, 'id': event['pathParameters']['id']})
         body = buildDefaultResponseBody(result['Item'], None, None)
     except ClientError as ce:
-        status_code, body = buildClientErrorResponseBody(e.response)
+        status_code, body = buildClientErrorResponseBody(ce.response)
     except Exception as e:
         status_code = 404
         if (not 'Item' in result):

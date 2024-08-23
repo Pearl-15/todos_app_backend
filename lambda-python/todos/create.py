@@ -9,6 +9,8 @@ dynamodb = boto3.resource('dynamodb')
 
 def create(event, context):
 
+    print(event)
+
     data = json.loads(event['body'])
 
     # validation "title" field
@@ -21,7 +23,11 @@ def create(event, context):
     # table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
     table = dynamodb.Table('TODOTABLE')
 
+    #get user_id 
+    user_id = event['requestContext']['authorizer']['claims']['sub']
+
     item = {
+        'user_id': user_id,
         'id': str(uuid.uuid1()),
         'date': data['date'],
         'title': data['title'],

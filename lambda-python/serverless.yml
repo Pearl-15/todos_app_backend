@@ -22,6 +22,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource: 'arn:aws:dynamodb:us-east-1:*:table/TODOTABLE'
+        
 
 package:
   individually: true
@@ -41,6 +42,13 @@ functions:
           path: /todos/{id}
           method: get
           cors: true
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - CognitoUserPool
+                - Arn
 
   create:
     handler: todos/create.create
@@ -54,6 +62,14 @@ functions:
           path: /create
           method: post
           cors: true
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - CognitoUserPool
+                - Arn
+
     
   list:
     handler: todos/list.list
@@ -67,6 +83,14 @@ functions:
           path: /list
           method: get
           cors: true
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - CognitoUserPool
+                - Arn
+
 
   update:
     handler: todos/update.update
@@ -81,6 +105,13 @@ functions:
           path: /todos/{id}
           method: put
           cors: true
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - CognitoUserPool
+                - Arn
 
   delete:
     handler: todos/delete.delete
@@ -95,6 +126,13 @@ functions:
           path: /todos/{id}
           method: delete
           cors: true
+          authorizer:
+            name: CognitoAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - CognitoUserPool
+                - Arn
 
 resources:
   Resources:
@@ -103,11 +141,15 @@ resources:
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
           - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: user_id
             KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

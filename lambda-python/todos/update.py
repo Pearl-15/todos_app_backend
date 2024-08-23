@@ -55,9 +55,12 @@ def update(event, context):
     status_code = 200
     body = {}
 
+    #get user_id 
+    user_id = event['requestContext']['authorizer']['claims']['sub']
+
     try:
         result = table.update_item(
-        Key={'id': event['pathParameters']['id']},
+        Key={'user_id': user_id,'id': event['pathParameters']['id']},
         ExpressionAttributeValues=expression_attribute_values,
         ExpressionAttributeNames=expression_attribute_names,
         UpdateExpression=update_expression_str,
