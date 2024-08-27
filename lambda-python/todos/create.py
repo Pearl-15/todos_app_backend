@@ -20,7 +20,6 @@ def create(event, context):
         response["body"] = json.dumps(buildDefaultResponseBody(None,"Title is empty!", "Title cannot be empty, please provide title." ))
         return response
 
-    # table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
     table = dynamodb.Table('TODOTABLE')
 
     #get user_id 

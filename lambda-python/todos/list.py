@@ -7,7 +7,6 @@ from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
-# table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
 def list(event, context):
     print("List function event", event)

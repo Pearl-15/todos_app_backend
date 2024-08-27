@@ -8,7 +8,6 @@ from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
-# table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
 def update(event, context):
     data = json.loads(event['body'])
@@ -24,26 +23,6 @@ def update(event, context):
 
     update_expression = []
     expression_attribute_values = {}
-    expression_attribute_names = {}
-        
-    # for key in ['title', 'content', 'status', 'date']:
-    #     if key in data:
-
-    #         # Use placeholder for reserved keywords
-    #         if key == 'status':
-    #             key_placeholder = '#status'
-    #         elif key == 'date':
-    #             key_placeholder = '#date'
-    #         else:
-    #             key_placeholder = key
-
-    #         update_expression.append(f"{key_placeholder} = :{key}")
-    #         expression_attribute_values[f":{key}"] = data[key]
-
-    #         if key == 'status':
-    #             expression_attribute_names['#status'] = key
-    #         elif key == 'date':
-    #             expression_attribute_names['#date'] = key
 
     for key in ['title', 'content', 'created_at', 'is_done', 'updated_at']:
         if key in data:
@@ -69,7 +48,6 @@ def update(event, context):
         result = table.update_item(
         Key={'user_id': user_id,'id': event['pathParameters']['id']},
         ExpressionAttributeValues=expression_attribute_values,
-        # ExpressionAttributeNames=expression_attribute_names,
         UpdateExpression=update_expression_str,
         ReturnValues='ALL_NEW'
         )

@@ -8,7 +8,6 @@ from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
-# table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 client = boto3.client('cognito-idp')
 
 def delete(event, context):
