@@ -2,6 +2,7 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from utils.utils import *
+from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
@@ -31,6 +32,6 @@ def get(event, context):
     print("query result : ", result)
 
     response = buildResponse(status_code, "GET")
-    response["body"] = json.dumps(body)
+    response["body"] = json.dumps(body, cls=decimalencoder.DecimalEncoder)
     return response
 

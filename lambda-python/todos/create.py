@@ -29,10 +29,10 @@ def create(event, context):
     item = {
         'user_id': user_id,
         'id': str(uuid.uuid1()),
-        'date': data['date'],
+        'created_at': data['created_at'],
         'title': data['title'],
         'content': data['content'],
-        'status': data['status']
+        'is_done': data['is_done']
     }
 
     status_code = 200

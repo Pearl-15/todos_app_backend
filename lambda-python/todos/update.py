@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 import os
 from utils.utils import * 
 from todos.get import get
+from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
@@ -18,31 +19,37 @@ def update(event, context):
     print("get_response ", get_response)
     if not get_body["data"]:
         response = buildResponse(404, "PUT")
-        response["body"] = json.dumps(get_body)
+        response["body"] = json.dumps(get_body, cls=decimalencoder.DecimalEncoder)
         return response
 
     update_expression = []
     expression_attribute_values = {}
     expression_attribute_names = {}
         
-    for key in ['title', 'content', 'status', 'date']:
+    # for key in ['title', 'content', 'status', 'date']:
+    #     if key in data:
+
+    #         # Use placeholder for reserved keywords
+    #         if key == 'status':
+    #             key_placeholder = '#status'
+    #         elif key == 'date':
+    #             key_placeholder = '#date'
+    #         else:
+    #             key_placeholder = key
+
+    #         update_expression.append(f"{key_placeholder} = :{key}")
+    #         expression_attribute_values[f":{key}"] = data[key]
+
+    #         if key == 'status':
+    #             expression_attribute_names['#status'] = key
+    #         elif key == 'date':
+    #             expression_attribute_names['#date'] = key
+
+    for key in ['title', 'content', 'created_at', 'is_done', 'updated_at']:
         if key in data:
-
-            # Use placeholder for reserved keywords
-            if key == 'status':
-                key_placeholder = '#status'
-            elif key == 'date':
-                key_placeholder = '#date'
-            else:
-                key_placeholder = key
-
+            key_placeholder = key
             update_expression.append(f"{key_placeholder} = :{key}")
             expression_attribute_values[f":{key}"] = data[key]
-
-            if key == 'status':
-                expression_attribute_names['#status'] = key
-            elif key == 'date':
-                expression_attribute_names['#date'] = key
     
     if not update_expression:
         return {
@@ -62,7 +69,7 @@ def update(event, context):
         result = table.update_item(
         Key={'user_id': user_id,'id': event['pathParameters']['id']},
         ExpressionAttributeValues=expression_attribute_values,
-        ExpressionAttributeNames=expression_attribute_names,
+        # ExpressionAttributeNames=expression_attribute_names,
         UpdateExpression=update_expression_str,
         ReturnValues='ALL_NEW'
         )
@@ -73,7 +80,7 @@ def update(event, context):
         status_code, body = buildClientErrorResponseBody(e.response)
     
     response = buildResponse(status_code, "PUT")
-    response["body"] = json.dumps(body)
+    response["body"] = json.dumps(body, cls=decimalencoder.DecimalEncoder)
 
     return response
 

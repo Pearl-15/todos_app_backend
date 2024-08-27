@@ -4,6 +4,7 @@ import os
 from botocore.exceptions import ClientError
 from utils.utils import *
 from todos.get import get
+from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
@@ -22,7 +23,7 @@ def delete(event, context):
     print("get_response ", get_response)
     if not get_body["data"]:
         response = buildResponse(404, "DELETE")
-        response["body"] = json.dumps(get_body)
+        response["body"] = json.dumps(get_body, cls=decimalencoder.DecimalEncoder)
         return response
 
     try:
@@ -38,7 +39,7 @@ def delete(event, context):
         status_code, body = buildClientErrorResponseBody(e.response)
 
     response = buildResponse(status_code, "DELETE")
-    response["body"] = json.dumps(body)
+    response["body"] = json.dumps(body, cls=decimalencoder.DecimalEncoder)
 
     return response
     

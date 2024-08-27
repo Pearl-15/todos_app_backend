@@ -3,6 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 from utils.utils import *
+from todos import decimalencoder
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TODOTABLE')
@@ -13,7 +14,7 @@ def list(event, context):
 
     #get user_id
     user_id = event['requestContext']['authorizer']['claims']['sub']
-    
+
 
     body = {}
     status_code = 200
@@ -31,6 +32,6 @@ def list(event, context):
         body = buildDefaultResponseBody(None,"Unexpected Error",str(e))
 
     response = buildResponse(status_code, "GET")
-    response["body"] = json.dumps(body)
+    response["body"] = json.dumps(body,cls=decimalencoder.DecimalEncoder)
 
     return response
